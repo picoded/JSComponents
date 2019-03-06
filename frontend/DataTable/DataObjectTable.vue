@@ -95,6 +95,12 @@ export default {
 			default: false
 		},
 
+		// Uses the following path instead when openPageInNewTab = true
+		// if its configured, else it will use objectPageName
+		openPageInNewTab_url : {
+			default: ""
+		},
+
 		//--------------------------------------------------------------------
 		// API linkage handling
 		//--------------------------------------------------------------------
@@ -298,7 +304,11 @@ export default {
 					$(row).click(function() {
 						if( self.objectPageName && self.objectPageName.length > 0 ) {
 							if( self.openPageInNewTab ) {
-								window.open( self.objectPageName + "?_oid="+data[0], '_blank' );
+								let urlPath = self.openPageInNewTab_url;
+								if( urlPath == null || urlPath.length <= 0 ) {
+									urlPath = self.objectPageName;
+								}
+								window.open( urlPath + "/?_oid="+data[0], '_blank' );
 							} else {
 								self.$router.push({
 									name : self.objectPageName,
