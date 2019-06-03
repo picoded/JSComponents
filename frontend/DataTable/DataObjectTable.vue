@@ -51,6 +51,10 @@ export default {
 			default: '["name"]'
 		},
 
+		searchFieldNames:{
+			default: ""
+		},
+
 		// Default OID collumn label, if blank it will be hidden
 		oidLabel : {
 			default: ""
@@ -93,6 +97,12 @@ export default {
 		// Configure how new pages are opened when row was clicked
 		openPageInNewTab : {
 			default: false
+		},
+
+		// Uses the following path instead when openPageInNewTab = true
+		// if its configured, else it will use objectPageName
+		openPageInNewTab_url : {
+			default: ""
 		},
 
 		//--------------------------------------------------------------------
@@ -149,6 +159,13 @@ export default {
 			return JSON.parse(this.fieldNames);
 		},
 
+		searchFieldNamesArray() {
+			if( Array.isArray(this.searchFieldNames) ) {
+				return this.searchFieldNames;
+			}
+			return JSON.parse(this.searchFieldNames);
+		},
+
 		// queryArgs as an array
 		queryArgsArray() {
 			if( Array.isArray(this.queryArgs) ) {
@@ -168,6 +185,10 @@ export default {
 		// Full filed names as an array : including the starting _oid
 		fieldNamesArray_full() {
 			return ["_oid"].concat( this.fieldNamesArray );
+		},
+
+		searchFieldNamesArray_full() {
+			return [].concat( this.searchFieldNamesArray );
 		},
 
 		//--------------------------------------------------------------------
@@ -259,6 +280,15 @@ export default {
 			// Basic self refrence
 			var self = this;
 
+			let restData = {
+				fieldList: JSON.stringify(self.fieldNamesArray_full),
+				searchMode: "both"
+			};
+
+			// if(self.searchFieldNamesArray_full !== ""){
+			// 	restData.searchFieldList = JSON.stringify(self.searchFieldNamesArray_full);
+			// }
+
 			// Config object to return
 			var config = {
 				processing: true,
@@ -268,10 +298,11 @@ export default {
 				ajax:{
 					url: self.fullApiUrl,
 					type: "POST",
-					data: {
-						fieldList: JSON.stringify(self.fieldNamesArray_full),
-						searchMode: "both"
-					},
+					// data: {
+					// 	fieldList: JSON.stringify(self.fieldNamesArray_full),
+					// 	searchMode: "both"
+					// },
+					data:restData,
 					xhrFields: {
 						withCredentials: true
 					}
@@ -298,7 +329,12 @@ export default {
 					$(row).click(function() {
 						if( self.objectPageName && self.objectPageName.length > 0 ) {
 							if( self.openPageInNewTab ) {
-								window.open( self.objectPageName + "?_oid="+data[0], '_blank' );
+								let urlPath = self.openPageInNewTab_url;
+								if( urlPath == null || urlPath.length <= 0 ) {
+									urlPath = self.objectPageName;
+								}
+								urlPath = urlPath.replace('-', '/')
+								window.open( urlPath + "?_oid="+data[0], '_blank' );
 							} else {
 								self.$router.push({
 									name : self.objectPageName,
