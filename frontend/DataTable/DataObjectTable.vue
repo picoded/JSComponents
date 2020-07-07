@@ -308,7 +308,9 @@ export default {
 								if( urlPath == null || urlPath.length <= 0 ) {
 									urlPath = self.objectPageName;
 								}
-								window.open( urlPath + "/?_oid="+data[0], '_blank' );
+								// urlPath = urlPath.replace('-', '/')
+								var newTabURL = urlPath + "?_oid=" + data[0];
+								window.open( newTabURL, '_blank' );
 							} else {
 								self.$router.push({
 									name : self.objectPageName,
